@@ -61,16 +61,14 @@ async function init() {
   var orbit = new THREE.OrbitControls( cameraManager.GetMainCamera(), canvas2D );
   orbit.target.set(0,0,0);
 
-  orbit.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+  orbit.enableDamping = true;
   orbit.dampingFactor = 0.05;
   orbit.screenSpacePanning = false;
 
   orbit.minDistance = 100;
   orbit.maxDistance = 500;
   // パンの無効化
-  orbit.enablePan = false;
-  
-  //orbit.maxPolarAngle = Math.PI / 2;
+  orbit.enablePan = true;
 
 
   // 平行光源
@@ -92,8 +90,8 @@ async function init() {
   var taskObjArray = new Array();
 
   let workPos = new THREE.Vector3(0, 0, 0);
-  let addVec = new THREE.Vector3(20, 0, 30);
-  for (let index = 0; index < 2; index++) {
+  let addVec = new THREE.Vector3(20, 0, 0);
+  for (let index = 0; index < 3; index++) {
     let testModel = resourceManager.GetModel(testModelPath);
     let taskObj = new TaskQuestionRoot();
     taskObj.Init(workPos.x, workPos.y, workPos.z, "適当", testModel, null);
@@ -108,15 +106,9 @@ async function init() {
   var questionIDX = 0;
   cameraManager.MainCameraObj.SetPos(GetNextCameraPos());
 
-  //床用のObj3D作成
-  //let groundObj = new Obj3D();
-  //groundObj.SetMesh(groundMesh);
-  //groundObj.SetPos(new THREE.Vector3(0, 0, 0));
-  // シーンに追加
-  //sceneManager.AddObj(groundMesh);
-
   // ここでフロー開始
   // ほぼイベントドリブンにする
+  var button = null;
   // フローの進行
   Flow.Init();
   init2D();
@@ -139,6 +131,15 @@ async function init() {
 
     orbit.update();
 
+    // 固定で二つのオブジェクトの座標から二次元座標を取得
+    let button1Pos = taskObjArray[0].rootObj3D.position.clone();
+    let pos2D = button1Pos.project( cameraManager.GetMainCamera() );
+    let posX = width * 0.5 * ( pos2D.x + 1.0);
+    let posY = height * 0.5 * ( -pos2D.y + 1.0);
+
+    button.SetPos(posX, posY);
+    stageManager.UpdateStage();
+
     // レンダリング
     renderer.render(SceneManager.instance.scene, cameraManager.GetMainCamera());
   }
@@ -147,9 +148,9 @@ async function init() {
   function init2D() {
     // テキストの表示
     // 座標はCanvasのサイズから算出
-    var test = new Button2D(250, 750, 100, 100, "YES", 25, "Black");
-    test.AddEvent("click", clickTest);
-    stageManager.AddObj(test.container);
+    button = new Button2D(250, 750, 100, 100, "YES", 25, "Black");
+    button.AddEvent("click", clickTest);
+    stageManager.AddObj(button.container);
 
     var test2 = new Button2D(550, 750, 100, 100, "NO", 25, "Blue");
     test2.AddEvent("click", clickTest2);
@@ -166,7 +167,7 @@ async function init() {
       questionIDX += 1;
       cameraManager.MainCameraObj.Move(
         GetNextCameraPos(),
-        new THREE.Vector3(0, 0, 0),
+        GetNextCameraTargetPos(),
         1
       );
 
@@ -180,16 +181,19 @@ async function init() {
       questionIDX += 1;
       cameraManager.MainCameraObj.Move(
         GetNextCameraPos(),
-        new THREE.Vector3(0, 0, 0),
+        GetNextCameraTargetPos(),
         1
       );
-
+      let targetPos;
+      targetPos = GetNextCameraTargetPos();
+      console.log(targetPos);
+      orbit.target = targetPos.clone();
       // Stageの描画を更新します
       stageManager.UpdateStage();
     }
   }
 
-  // 現在のインデックスのカメラの座標をい取得
+  // 現在のインデックスのカメラの座標取得
   function GetNextCameraPos() {
     if (taskObjArray.length <= questionIDX) {
       questionIDX = 0;
@@ -197,9 +201,19 @@ async function init() {
 
     let taskTarget = taskObjArray[questionIDX];
     let cameraPos = taskTarget.GetCameraPos();
-    console.log(cameraPos);
     return cameraPos.clone();
   }
+
+    // 現在のインデックスのカメラの注視点座標取得
+    function GetNextCameraTargetPos() {
+      if (taskObjArray.length <= questionIDX) {
+        questionIDX = 0;
+      }
+  
+      let taskTarget = taskObjArray[questionIDX];
+      let targetPos = taskTarget.rootObj3D.position;
+      return targetPos.clone();
+    }
 }
 
 // 処理待ち応急処置

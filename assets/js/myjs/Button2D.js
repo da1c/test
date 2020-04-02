@@ -19,7 +19,9 @@ class Button2D extends Obj2D{
     // 枠作成
     this.shape = new createjs.Shape();
     this.shape.graphics.beginFill("white"); // 赤色で描画するように設定
-    this.shape.graphics.drawRoundRect(0, 0, sizeX, sizeY, 10, 10); //半径 100px の円を描画
+    var harfSizeX = sizeX * 0.5;
+    var harfSizeY = sizeY * 0.5;
+    this.shape.graphics.drawRoundRect(-harfSizeX, -harfSizeY, sizeX, sizeY, 10, 10); //半径 100px の円を描画
     // コンテナに追加
     this.container.addChild(this.shape);
     this.shape.x = 0; // X 座標 200px の位置に配置
@@ -34,8 +36,8 @@ class Button2D extends Obj2D{
 
     // テキストをコンテナに追加
     this.container.addChild(this.text);
-    this.text.x = sizeX * 0.5;
-    this.text.y = sizeY * 0.5;
+    this.text.x = 0;
+    this.text.y = 0;
 
   }
 
@@ -73,6 +75,20 @@ class Button2D extends Obj2D{
   SetVisible( setValue ){
     this.shape.visible = setValue;
     this.text.visible = setValue;
+  }
+
+
+  /**
+   *ボタンの座標更新
+   *
+   * @param {number} posX x座標
+   * @param {number} posY y座標
+   * @memberof Button2D
+   */
+  SetPos(posX,posY){
+    // コンテナに座標設定
+    this.container.x = posX;
+    this.container.y = posY;
   }
 
 
