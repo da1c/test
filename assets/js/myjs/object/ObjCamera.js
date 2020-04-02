@@ -10,13 +10,13 @@ class ObjCamera extends Obj {
     // 変数定義
     // 座標
     this.pos = null; //this.camera.position.clone();
-    // 回転
-    this.targetPos = new THREE.Vector3(0, 0, 0); //this.camera.rotation.clone();
+    // 注視点
+    this.lookAtPos = null; 
     // 拡縮
     this.scale = new THREE.Vector3(0, 0, 0);
 
     // 注視点とかもいるかな
-    this.targetPos = new THREE.Vector3(0, 0, 0);
+    this.lookAtPos = new THREE.Vector3(0, 0, 0);
     // 更新用の関数
     this.UpdateFunc = () => {};
 
@@ -24,11 +24,11 @@ class ObjCamera extends Obj {
     // 移動開始時の座標
     this.originPos = new THREE.Vector3(0, 0, 0);
     // 移動開始時の角度
-    this.originTargetPos = new THREE.Vector3(0, 0, 0);
+    this.originLookAtPos = new THREE.Vector3(0, 0, 0);
     // 現在の座標と目標座標の差分
     this.diffPos = new THREE.Vector3(0, 0, 0);
     // 現在の注視点と目標注視点の差分
-    this.diffTargetPos = new THREE.Vector3(0, 0, 0);
+    this.diffLookAtPos = new THREE.Vector3(0, 0, 0);
 
     // 移動時間
     this.moveTime = 0.0;
@@ -48,6 +48,7 @@ class ObjCamera extends Obj {
   UpdateCameraInfo(){
     // 座標
     this.pos = this.camera.position.clone();
+    this.lookAtPos = CameraManager.instance.GetOrbitTarget();
   }
 
   /**
@@ -59,9 +60,9 @@ class ObjCamera extends Obj {
     this.moveTime = 0.0;
     this.elapsedTime = 0.0;
     this.originPos.set(0.0, 0.0, 0.0);
-    this.originTargetPos.set(0.0, 0.0, 0.0);
+    this.originLookAtPos.set(0.0, 0.0, 0.0);
     this.diffPos.set(0.0, 0.0, 0.0);
-    this.diffTargetPos.set(0.0, 0.0, 0.0);
+    this.diffLookAtPos.set(0.0, 0.0, 0.0);
   }
 
   /**
@@ -73,8 +74,10 @@ class ObjCamera extends Obj {
    * @param {number} far　ファークリップ
    * @memberof ObjCamera
    */
-  SetPerspectiveCamera(fov, aspectRatio, near, far) {
+  SetPerspectiveCamera(fov, aspectRatio, near, far, lookAtPos) {
     this.camera = new THREE.PerspectiveCamera(fov, aspectRatio, near, far);
+    this.lookAtPos = lookAtPos.clone();
+    this.camera.lookAt(lookAtPos);
   }
 
   /**
@@ -96,20 +99,21 @@ class ObjCamera extends Obj {
    */
   Draw() {
     this.camera.position.set(this.pos.x, this.pos.y, this.pos.z);
+    this.camera.lookAt(this.lookAtPos);
   }
 
   // 移動処理
-  Move(dstPos, dstTargetPos, moveTime) {
+  Move(dstPos, dstlookAtPos, moveTime) {
     // 移動情報の初期化
     this.InitMoveInfo();
 
     // 現在の座標/角度を保存
     this.originPos = this.pos;
     // オービットコントロールからターゲットを取得かな・・・
-    this.originTargetPos = this.targetPos;
+    this.originLookAtPos = this.lookAtPos;
     // 目標座標/角度との現在の座標/角度の差分算出
     this.diffPos = SubVector3(dstPos, this.pos);
-    this.diffTargetPos = SubVector3(dstTargetPos, this.targetPos);
+    this.diffLookAtPos = SubVector3(dstlookAtPos, this.lookAtPos);
     // 移動時間を設定
     this.moveTime = moveTime;
 
@@ -131,24 +135,25 @@ class ObjCamera extends Obj {
     if (ratio >= 1.0) {
       // 座標などを目標値に設定
       this.pos = AddVector3(this.originPos, this.diffPos);
-      this.rot = AddVector3(this.originTargetPos, this.diffTargetPos);
+      this.lookAtPos = AddVector3(this.originLookAtPos, this.diffLookAtPos);
       // 更新処理を初期化
       this.UpdateFunc = () => {};
 
       // 移動完了通知を出す
       this.NoticeEndMove();
-      // 移動官僚通知を初期化
+      // 移動完了通知を初期化
       this.NoticeEndMove = ()=>{};
       return;
     }
 
     // 移動開始前の座標/角度に経過時間の割合分の差分情報を加算
     let workPos = this.diffPos.clone();
-    let workRot = this.diffTargetPos.clone();
+    let workRot = this.diffLookAtPos.clone();
     workPos.multiplyScalar(ratio);
     workRot.multiplyScalar(ratio);
     this.pos = AddVector3(this.originPos, workPos);
-    this.rot = AddVector3(this.originTargetPos, workRot);
+    this.lookAtPos = AddVector3(this.originLookAtPos, workRot);
+    CameraManager.instance.SetOrbitTarget(this.lookAtPos);
   }
 
   /**

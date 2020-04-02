@@ -16,8 +16,11 @@ class CameraManager{
       // クラスのインスタンスを保存
       CameraManager.instance = this;
       this.MainCameraObj = null;
-    }
 
+      // オービット
+      this.orbitControl = null;
+
+    }
 
   /**
    * メインカメラ作成
@@ -28,13 +31,61 @@ class CameraManager{
    * @param {number} far　ファークリップ
    * @memberof CameraManager
    */
-  CreateMainCamera( fov, aspectRatio, near, far ){
+  CreateMainCamera( fov, aspectRatio, near, far, lookAtPos){
     // カメラ作成
     this.MainCameraObj = new ObjCamera();
     // 透視投影のカメラ設定
-    this.MainCameraObj.SetPerspectiveCamera(fov, aspectRatio, near, far);
+    this.MainCameraObj.SetPerspectiveCamera(fov, aspectRatio, near, far, lookAtPos);
   }
 
+  
+  /**
+   *オービットコントロールの作成
+   * @param {camera} camera
+   * @param {*} canvas
+   * @memberof CameraManager
+   */
+  CreateOrbitControl(camera, canvas){
+
+    this.orbitControl = new THREE.OrbitControls( camera, canvas );
+  
+    this.orbitControl.enableDamping = true;
+    this.orbitControl.dampingFactor = 0.05;
+    this.orbitControl.screenSpacePanning = false;
+  
+    this.orbitControl.minDistance = 100;
+    this.orbitControl.maxDistance = 500;
+    // パンの無効化
+    this.orbitControl.enablePan = false;
+
+    this.orbitControl.saveState();
+
+  }
+
+  
+  /**
+   *
+   *
+   * @param {*} targetPos
+   * @memberof CameraManager
+   */
+  SetOrbitTarget(targetPos){
+
+    this.orbitControl.target = targetPos.clone();
+  }
+
+  /**
+   *オービットコントロールの更新
+   *
+   * @memberof CameraManager
+   */
+  UpdateOrbitControl(){
+    this.orbitControl.update();
+  }
+
+  GetOrbitTarget(){
+    return this.orbitControl.target.clone();
+  }
 
   /**
    *メインカメラの座標更新
@@ -45,9 +96,8 @@ class CameraManager{
    * @memberof CameraManager
    */
   MoveMainCamera( posX, posY, posZ ){
-    //this.MainCameraObj.SetPos(posX, posY, posZ);
+    this.MainCameraObj.SetPos(posX, posY, posZ);
   }
-
 
   /**
    *メインカメラのオブジェクトからカメラ取得
@@ -58,10 +108,6 @@ class CameraManager{
   GetMainCamera(){
     return this.MainCameraObj.camera;
   }
-
-  // 移動用のカメラ
-
-
 }
 
 // 本体のインスタンス定義

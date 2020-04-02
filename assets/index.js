@@ -45,7 +45,7 @@ async function init() {
 
   // カメラマネージャー作成
   var cameraManager = new CameraManager();
-  cameraManager.CreateMainCamera(45, width / height, 1, 1000);
+  cameraManager.CreateMainCamera(45, width / height, 1, 1000, new THREE.Vector3( 0.0, 0.0, 0.0));
 
   // カメラの座標更新
   cameraManager.MainCameraObj.SetPos(new THREE.Vector3(0, 5, +30));
@@ -58,17 +58,7 @@ async function init() {
   // タッチ操作のカメラの作成
   // タッチ検出用のDivを取得
   var canvas2D = document.getElementById('Canvas2D');
-  var orbit = new THREE.OrbitControls( cameraManager.GetMainCamera(), canvas2D );
-  orbit.target.set(0,0,0);
-
-  orbit.enableDamping = true;
-  orbit.dampingFactor = 0.05;
-  orbit.screenSpacePanning = false;
-
-  orbit.minDistance = 100;
-  orbit.maxDistance = 500;
-  // パンの無効化
-  orbit.enablePan = true;
+  cameraManager.CreateOrbitControl( cameraManager.GetMainCamera(), canvas2D);
 
 
   // 平行光源
@@ -129,7 +119,9 @@ async function init() {
     // Obejctの座標反映
     objManager.Draw();
 
-    orbit.update();
+    // OrbitControlの更新
+    cameraManager.UpdateOrbitControl();
+
 
     // 固定で二つのオブジェクトの座標から二次元座標を取得
     let button1Pos = taskObjArray[0].rootObj3D.position.clone();
@@ -171,8 +163,6 @@ async function init() {
         1
       );
 
-      // Stageの描画を更新します
-      stageManager.UpdateStage();
     }
 
     function clickTest2() {
@@ -184,12 +174,7 @@ async function init() {
         GetNextCameraTargetPos(),
         1
       );
-      let targetPos;
-      targetPos = GetNextCameraTargetPos();
-      console.log(targetPos);
-      orbit.target = targetPos.clone();
-      // Stageの描画を更新します
-      stageManager.UpdateStage();
+
     }
   }
 
