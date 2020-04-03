@@ -12,15 +12,21 @@ class StageManager {
   constructor() {
     // インスタンスの保存
     StageManager.instance = this;
+
+    this.width = 0;
+    this.height = 0;
   }
 
   /**
    *初期化処理
    * @memberof StageManager
    */
-  Init(canvasID) {
+  Init(canvasID, width, height) {
     // Stage作成
     this.stage = new createjs.Stage(canvasID);
+
+    this.width = width;
+    this.height = height;
   }
 
   /**

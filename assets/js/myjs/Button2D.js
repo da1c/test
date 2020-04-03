@@ -8,7 +8,7 @@ class Button2D extends Obj2D{
    * @param {*} fontSize フォントサイズ
    * @memberof Button2D
    */
-  constructor( posX, posY,sizeX, sizeY, textValue, fontSize, color){
+  constructor( posX, posY,sizeX, sizeY, textValue, fontSize, color, groupID){
 
     super();
 
@@ -39,6 +39,14 @@ class Button2D extends Obj2D{
     this.text.x = 0;
     this.text.y = 0;
 
+    // グループID設定
+    this.groupID = groupID;
+
+    // ボタンマネージャーに登録し、IDを取得
+    this.ID = ButtonManager.instance.regist(this);
+
+    // ボタンの種類識別ID
+    this.kindID = ButtonManager.instance.enumButtonID.Button2D;
   }
 
   

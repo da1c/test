@@ -31,11 +31,11 @@ class CameraManager{
    * @param {number} far　ファークリップ
    * @memberof CameraManager
    */
-  CreateMainCamera( fov, aspectRatio, near, far, lookAtPos){
+  CreateMainCamera( fov, aspectRatio, near, far, cameraPos,lookAtPos){
     // カメラ作成
     this.MainCameraObj = new ObjCamera();
     // 透視投影のカメラ設定
-    this.MainCameraObj.SetPerspectiveCamera(fov, aspectRatio, near, far, lookAtPos);
+    this.MainCameraObj.SetPerspectiveCamera(fov, aspectRatio, near, far, cameraPos, lookAtPos);
   }
 
   
@@ -53,20 +53,18 @@ class CameraManager{
     this.orbitControl.dampingFactor = 0.05;
     this.orbitControl.screenSpacePanning = false;
   
-    this.orbitControl.minDistance = 100;
+    this.orbitControl.minDistance = 10;
     this.orbitControl.maxDistance = 500;
     // パンの無効化
     this.orbitControl.enablePan = false;
 
-    this.orbitControl.saveState();
-
+    //this.orbitControl.saveState();
   }
 
-  
   /**
+   *Orbitコントロールの注視点設定
    *
-   *
-   * @param {*} targetPos
+   * @param {Vector3} targetPos　注視点
    * @memberof CameraManager
    */
   SetOrbitTarget(targetPos){
@@ -108,6 +106,12 @@ class CameraManager{
   GetMainCamera(){
     return this.MainCameraObj.camera;
   }
+
+  log(no){
+    console.log('No.' + no +'-MainCameraPos:');
+    console.log( this.MainCameraObj.camera.position);
+  }
+
 }
 
 // 本体のインスタンス定義

@@ -38,20 +38,24 @@ async function init() {
   objManager.Init();
   // Stageマネージャー作成
   var stageManager = new StageManager();
-  stageManager.Init("Canvas2D");
+  stageManager.Init("Canvas2D", width, height);
 
   // Resorceマネージャーの作成
   var resourceManager = new ResourceManager();
 
   // カメラマネージャー作成
   var cameraManager = new CameraManager();
-  cameraManager.CreateMainCamera(45, width / height, 1, 1000, new THREE.Vector3( 0.0, 0.0, 0.0));
+  cameraManager.CreateMainCamera(45, width / height, 1, 1000, new THREE.Vector3( 0.0, 0.0, 10.0),new THREE.Vector3( 0.0, 0.0, 0.0));
 
   // カメラの座標更新
   cameraManager.MainCameraObj.SetPos(new THREE.Vector3(0, 5, +30));
 
   // Timeマネージャー作成
   var timeManager = new TimeManager();
+
+  // ボタンマネージャー作成
+  var buttonManager = new ButtonManager();
+  buttonManager.Init();
 
   // --------------------------------------------------------------
 
@@ -103,7 +107,9 @@ async function init() {
   Flow.Init();
   init2D();
   // 初回実行
+
   tick();
+
 
   // フレームごとの更新処理
   function tick() {
@@ -112,6 +118,11 @@ async function init() {
 
     // Timeマネージャー更新
     timeManager.UpdateTime();
+
+
+    // OrbitControlの更新
+    cameraManager.UpdateOrbitControl();
+
     // 更新処理
     taskManager.Update();
 
@@ -119,17 +130,7 @@ async function init() {
     // Obejctの座標反映
     objManager.Draw();
 
-    // OrbitControlの更新
-    cameraManager.UpdateOrbitControl();
 
-
-    // 固定で二つのオブジェクトの座標から二次元座標を取得
-    let button1Pos = taskObjArray[0].rootObj3D.position.clone();
-    let pos2D = button1Pos.project( cameraManager.GetMainCamera() );
-    let posX = width * 0.5 * ( pos2D.x + 1.0);
-    let posY = height * 0.5 * ( -pos2D.y + 1.0);
-
-    button.SetPos(posX, posY);
     stageManager.UpdateStage();
 
     // レンダリング
@@ -140,11 +141,11 @@ async function init() {
   function init2D() {
     // テキストの表示
     // 座標はCanvasのサイズから算出
-    button = new Button2D(250, 750, 100, 100, "YES", 25, "Black");
+    button = new Button3D(250, 750, 100, 100, "YES", 25, "Black", 1, 0,taskObjArray[0].rootObj3D.position.clone());
     button.AddEvent("click", clickTest);
     stageManager.AddObj(button.container);
 
-    var test2 = new Button2D(550, 750, 100, 100, "NO", 25, "Blue");
+    var test2 = new Button3D(550, 750, 100, 100, "NO", 25, "Blue", 2, 0, taskObjArray[1].rootObj3D.position.clone());
     test2.AddEvent("click", clickTest2);
     stageManager.AddObj(test2.container);
 

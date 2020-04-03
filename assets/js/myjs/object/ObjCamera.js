@@ -72,11 +72,13 @@ class ObjCamera extends Obj {
    * @param {number} aspectRatio アスペクト比率
    * @param {number} near ニアクリップ
    * @param {number} far　ファークリップ
+   * @param {Vector3} position 座標
    * @memberof ObjCamera
    */
-  SetPerspectiveCamera(fov, aspectRatio, near, far, lookAtPos) {
+  SetPerspectiveCamera(fov, aspectRatio, near, far, position, lookAtPos) {
     this.camera = new THREE.PerspectiveCamera(fov, aspectRatio, near, far);
     this.lookAtPos = lookAtPos.clone();
+    this.camera.position.set( position.x, position.y,position.z);
     this.camera.lookAt(lookAtPos);
   }
 
@@ -164,6 +166,7 @@ class ObjCamera extends Obj {
    */
   SetPos(dstPos) {
     this.pos = dstPos;
+    this.camera.position.set( dstPos.x, dstPos.y,dstPos.z);
   }
 
   /**
