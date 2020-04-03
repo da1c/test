@@ -141,13 +141,17 @@ async function init() {
   function init2D() {
     // テキストの表示
     // 座標はCanvasのサイズから算出
-    button = new Button3D(250, 750, 100, 100, "YES", 25, "Black", 1, 0,taskObjArray[0].rootObj3D.position.clone());
+    button = new Button3D(250, 750, 100, 100, "①", 75, "White", 1, 0,taskObjArray[0].rootObj3D.position.clone());
     button.AddEvent("click", clickTest);
     stageManager.AddObj(button.container);
 
-    var test2 = new Button3D(550, 750, 100, 100, "NO", 25, "Blue", 2, 0, taskObjArray[1].rootObj3D.position.clone());
+    var test2 = new Button3D(550, 750, 100, 100, "②", 75, "White", 2, 1, taskObjArray[1].rootObj3D.position.clone());
     test2.AddEvent("click", clickTest2);
     stageManager.AddObj(test2.container);
+
+    var test3 = new Button3D(550, 750, 100, 100, "③", 75, "White", 2, 2, taskObjArray[2].rootObj3D.position.clone());
+    test3.AddEvent("click", clickTest3);
+    stageManager.AddObj(test3.container);
 
     //clickTest2();
     // Stageの描画を更新します
@@ -157,7 +161,7 @@ async function init() {
     function clickTest() {
       console.log("clickTest");
 
-      questionIDX += 1;
+      questionIDX = 0;
       cameraManager.MainCameraObj.Move(
         GetNextCameraPos(),
         GetNextCameraTargetPos(),
@@ -169,7 +173,19 @@ async function init() {
     function clickTest2() {
       console.log("clickTest2");
       //
-      questionIDX += 1;
+      questionIDX = 1;
+      cameraManager.MainCameraObj.Move(
+        GetNextCameraPos(),
+        GetNextCameraTargetPos(),
+        1
+      );
+
+    }
+
+    function clickTest3() {
+      console.log("clickTest2");
+      //
+      questionIDX = 2;
       cameraManager.MainCameraObj.Move(
         GetNextCameraPos(),
         GetNextCameraTargetPos(),

@@ -18,7 +18,7 @@ class Button2D extends Obj2D{
 
     // 枠作成
     this.shape = new createjs.Shape();
-    this.shape.graphics.beginFill("white"); // 赤色で描画するように設定
+    this.shape.graphics.beginFill("blue"); // 赤色で描画するように設定
     var harfSizeX = sizeX * 0.5;
     var harfSizeY = sizeY * 0.5;
     this.shape.graphics.drawRoundRect(-harfSizeX, -harfSizeY, sizeX, sizeY, 10, 10); //半径 100px の円を描画
@@ -97,6 +97,18 @@ class Button2D extends Obj2D{
     // コンテナに座標設定
     this.container.x = posX;
     this.container.y = posY;
+  }
+
+
+  /**
+   *ボタンの種類確認
+   *
+   * @param {*} targetKindID
+   * @returns
+   * @memberof Button2D
+   */
+  CheckButtonKind(targetKindID){
+    return this.kindID == targetKindID;
   }
 
 
