@@ -56,7 +56,7 @@ class CameraManager{
     this.orbitControl.minDistance = 10;
     this.orbitControl.maxDistance = 500;
     // パンの無効化
-    this.orbitControl.enablePan = false;
+    this.orbitControl.enablePan = true;
 
     //this.orbitControl.saveState();
   }
